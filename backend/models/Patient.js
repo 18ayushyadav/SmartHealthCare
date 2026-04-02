@@ -12,10 +12,9 @@ const patientSchema = new mongoose.Schema({
     address: { type: String },
 }, { timestamps: true });
 
-patientSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) return next();
+patientSchema.pre('save', async function () {
+    if (!this.isModified('password')) return;
     this.password = await bcrypt.hash(this.password, 12);
-    next();
 });
 
 patientSchema.methods.matchPassword = async function (enteredPassword) {
