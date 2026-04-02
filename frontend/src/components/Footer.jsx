@@ -40,7 +40,7 @@ const Footer = () => (
                 <ul className="space-y-2.5 text-sm">
                     <li className="flex items-center gap-2"><Phone size={14} className="text-primary-400" />(+91) 98765-43210</li>
                     <li className="flex items-center gap-2"><Mail size={14} className="text-primary-400" />support@mediconnect.in</li>
-                    <li className="flex items-center gap-2"><MapPin size={14} className="text-primary-400" />Mumbai, India</li>
+                    <li className="flex items-center gap-2"><MapPin size={14} className="text-primary-400" />Delhi, India</li>
                 </ul>
             </div>
         </div>
