@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import toast from 'react-hot-toast';
-import { HeartPulse, Eye, EyeOff, UserPlus } from 'lucide-react';
+import { HeartPulse, Eye, EyeOff, UserPlus, ArrowLeft } from 'lucide-react';
 
 const ROLES = [
     { label: 'Patient', value: 'patient' },
@@ -55,6 +55,9 @@ const Register = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-purple-50 flex items-center justify-center px-4 py-12">
             <div className="w-full max-w-md">
+                <Link to="/" className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-primary-600 mb-6 transition-colors font-medium">
+                    <ArrowLeft size={16} /> Back to Home
+                </Link>
                 <div className="text-center mb-8">
                     <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br from-primary-500 to-purple-600 flex items-center justify-center shadow-xl mb-3">
                         <HeartPulse size={28} className="text-white" />
