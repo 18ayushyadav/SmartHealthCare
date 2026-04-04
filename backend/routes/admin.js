@@ -7,6 +7,18 @@ const Appointment = require('../models/Appointment');
 const Admin = require('../models/Admin');
 const { protect, authorize } = require('../middleware/auth');
 
+// @POST /api/admin/seed — create default admin
+router.post('/seed', async (req, res) => {
+    try {
+        const exists = await Admin.findOne({ email: 'admin@mediconnect.com' });
+        if (exists) return res.json({ message: 'Admin already exists' });
+        await Admin.create({ username: 'admin', email: 'admin@mediconnect.com', password: 'admin123' });
+        res.status(201).json({ message: 'Admin created: admin@mediconnect.com / admin123' });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 // All admin routes require admin auth
 router.use(protect, authorize('admin'));
 
@@ -104,16 +116,6 @@ router.get('/appointments', async (req, res) => {
     }
 });
 
-// @POST /api/admin/seed — create default admin
-router.post('/seed', async (req, res) => {
-    try {
-        const exists = await Admin.findOne({ email: 'admin@mediconnect.com' });
-        if (exists) return res.json({ message: 'Admin already exists' });
-        await Admin.create({ username: 'admin', email: 'admin@mediconnect.com', password: 'admin123' });
-        res.status(201).json({ message: 'Admin created: admin@mediconnect.com / admin123' });
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
+
 
 module.exports = router;
