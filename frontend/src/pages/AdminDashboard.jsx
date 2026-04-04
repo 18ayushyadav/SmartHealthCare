@@ -3,7 +3,7 @@ import api from '../api/axios';
 import toast from 'react-hot-toast';
 import {
     Users, Stethoscope, Building2, CalendarCheck, Trash2,
-    TrendingUp, CheckCircle, Clock, XCircle
+    TrendingUp, CheckCircle, Clock, XCircle, Plus
 } from 'lucide-react';
 
 const TABS = ['overview', 'patients', 'doctors', 'hospitals', 'appointments'];
@@ -28,6 +28,8 @@ const AdminDashboard = () => {
     const [doctors, setDoctors] = useState([]);
     const [hospitals, setHospitals] = useState([]);
     const [appointments, setAppointments] = useState([]);
+    const [showHospitalForm, setShowHospitalForm] = useState(false);
+    const [hospitalForm, setHospitalForm] = useState({ hospital_name: '', location: '', contact: '', email: '', description: '' });
 
     useEffect(() => { api.get('/admin/stats').then(({ data }) => setStats(data)); }, []);
 
@@ -51,12 +53,16 @@ const AdminDashboard = () => {
         toast.success('Deleted');
     };
 
-    const seedAdmin = async () => {
+    const handleAddHospital = async (e) => {
+        e.preventDefault();
         try {
-            const { data } = await api.post('/admin/seed');
-            toast.success(data.message);
+            const { data } = await api.post('/hospitals/register', hospitalForm);
+            setHospitals([data, ...hospitals]);
+            toast.success('Hospital added successfully');
+            setShowHospitalForm(false);
+            setHospitalForm({ hospital_name: '', location: '', contact: '', email: '', description: '' });
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Failed');
+            toast.error(err.response?.data?.message || 'Failed to add hospital');
         }
     };
 
@@ -71,9 +77,6 @@ const AdminDashboard = () => {
                         <h1 className="text-2xl font-extrabold mb-1">Admin Dashboard</h1>
                         <p className="text-blue-200 text-sm">MediConnect Control Center</p>
                     </div>
-                    <button onClick={seedAdmin} className="bg-white/20 hover:bg-white/30 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors border border-white/30">
-                        Seed Admin
-                    </button>
                 </div>
 
                 {/* Tab Nav */}
@@ -172,10 +175,55 @@ const AdminDashboard = () => {
 
                 {/* Hospitals */}
                 {tab === 'hospitals' && (
-                    <div className="card">
-                        <h2 className="font-bold text-slate-800 mb-4">All Hospitals ({hospitals.length})</h2>
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm">
+                    <div className="space-y-6">
+                        <div className="flex justify-between items-center">
+                            <h2 className="font-bold text-slate-800 text-xl">All Hospitals ({hospitals.length})</h2>
+                            <button onClick={() => setShowHospitalForm(!showHospitalForm)} className="btn-primary flex items-center gap-2 text-sm py-2">
+                                <Plus size={16} /> {showHospitalForm ? 'Cancel' : 'Add Hospital'}
+                            </button>
+                        </div>
+                        
+                        {showHospitalForm && (
+                            <div className="card shadow-md border border-slate-100">
+                                <h3 className="font-bold text-slate-800 mb-4">Add New Hospital</h3>
+                                <form onSubmit={handleAddHospital} className="space-y-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-slate-700 mb-1">Hospital Name</label>
+                                            <input type="text" required className="input-field" placeholder="City General Hospital"
+                                                value={hospitalForm.hospital_name} onChange={e => setHospitalForm({...hospitalForm, hospital_name: e.target.value})} />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-slate-700 mb-1">Location</label>
+                                            <input type="text" required className="input-field" placeholder="123 Health Ave, City"
+                                                value={hospitalForm.location} onChange={e => setHospitalForm({...hospitalForm, location: e.target.value})} />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-slate-700 mb-1">Contact Phone</label>
+                                            <input type="text" required className="input-field" placeholder="+1 234 567 8900"
+                                                value={hospitalForm.contact} onChange={e => setHospitalForm({...hospitalForm, contact: e.target.value})} />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                                            <input type="email" required className="input-field" placeholder="contact@hospital.com"
+                                                value={hospitalForm.email} onChange={e => setHospitalForm({...hospitalForm, email: e.target.value})} />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+                                        <textarea className="input-field h-20 resize-none" placeholder="Brief description of the hospital facilities..."
+                                            value={hospitalForm.description} onChange={e => setHospitalForm({...hospitalForm, description: e.target.value})}></textarea>
+                                    </div>
+                                    <div className="flex justify-end mt-4">
+                                        <button type="submit" className="btn-primary py-2 px-6">Save Hospital</button>
+                                    </div>
+                                </form>
+                            </div>
+                        )}
+
+                        <div className="card">
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-sm">
                                 <thead><tr className="border-b border-slate-100">
                                     {['Hospital Name', 'Location', 'Contact', 'Doctors', 'Actions'].map(h => <th key={h} className="text-left py-3 px-3 text-xs text-slate-500 font-semibold uppercase">{h}</th>)}
                                 </tr></thead>
@@ -195,6 +243,7 @@ const AdminDashboard = () => {
                             </table>
                             {hospitals.length === 0 && <p className="text-center py-8 text-slate-500">No hospitals found</p>}
                         </div>
+                    </div>
                     </div>
                 )}
 
