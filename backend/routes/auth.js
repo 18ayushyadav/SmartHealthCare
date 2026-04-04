@@ -41,6 +41,29 @@ router.post('/patient/login', async (req, res) => {
     }
 });
 
+// @POST /api/auth/doctor/register
+router.post('/doctor/register', async (req, res) => {
+    try {
+        const { name, email, phone, password, specialization, experience, fee } = req.body;
+        const exists = await Doctor.findOne({ email });
+        if (exists) return res.status(400).json({ message: 'Doctor already registered' });
+        
+        const doctor = await Doctor.create({ 
+            name, email, phone, password, specialization, 
+            experience: experience || 0, fee: fee || 0 
+        });
+        
+        res.status(201).json({
+            _id: doctor._id, name: doctor.name, email: doctor.email,
+            specialization: doctor.specialization, phone: doctor.phone,
+            role: 'doctor',
+            token: generateToken(doctor._id, 'doctor'),
+        });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 // @POST /api/auth/doctor/login
 router.post('/doctor/login', async (req, res) => {
     try {
